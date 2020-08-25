@@ -52,14 +52,14 @@ class MovieListActivity : AppCompatActivity() {
 
         //API를 호출함
 
-        val request = JsonObjectRequest(Request.Method.GET, url,
+        val request = JsonObjectRequest(Request.Method.GET, url,null,
             Response.Listener {//데이터가 정상적으로 호출됐을 때 처리하는 부분
                 //받아온 json 데이터를 Toast message로 출력
                     response ->
                 try { //response(영화 JSON 데이터)가 정상적으로 넘어온 경우
                     Toast.makeText(this, response.toString(), Toast.LENGTH_SHORT).show()
                 } catch (e: JSONException) {
-                    //response가 정상적으로 넘어오지 않은 경우
+                    //response가 정상적으로 넘어오지 않은 경우 4
                     Toast.makeText(this, e.localizedMessage, Toast.LENGTH_SHORT).show()
                 }
             }, Response.ErrorListener { //데이터가 정상적으로 호출되지 않았을 때 처리하는 부분

@@ -9,6 +9,7 @@ import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_movie_list.*
 import org.json.JSONException
 
@@ -28,36 +29,39 @@ import org.json.JSONException
 
 class MovieListActivity : AppCompatActivity() {
 
-    //영화 정보를 담고 있는 ArrayList 만들기.
-    val movieList: ArrayList<Movie> = arrayListOf(
-        Movie("테넷", 22.433, "시간의 흐름은...", "2020-08-06", R.drawable.m2),
-        Movie("소년 시절의 너", 17.321, "넌 세상을 지켜...", "2020-07-09", R.drawable.m4),
-        Movie("덤케르크 이스케이프", 15.842, "역사에 기록되지 않은...", "2020-08-06", R.drawable.m3),
-        Movie("짱구는 못말려: 신혼여행 허리케인", 10.954, "짱구 THE Movie...", "2020-08-06", R.drawable.m1)
-
-    )
+    //영화 정보를 담고 있는 ArrayList 만들기. -> 정보를 받아오면서 필요없게 되어 삭제
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_movie_list)
 
-
         //Volley에 RequestQueue 생성하기
         var requestQueue: RequestQueue = Volley.newRequestQueue(this)
 
+        //Gson 객제 선언
+        var gson: Gson = Gson()
+
         //API 주소 선언
         val url =
-            "https://api.themoviedb.org/3/movie/now_playing" + "api_key=72fab48cf7adad01dfc48e7a1c39e242" + "&language=ko-KR" + "&region=KR"
+            "https://api.themoviedb.org/3/movie/now_playing?" + "api_key=72fab48cf7adad01dfc48e7a1c39e242" + "&language=ko-KR" + "&region=KR"
 
 
         //API를 호출함
 
-        val request = JsonObjectRequest(Request.Method.GET, url,null,
+        val request = JsonObjectRequest(Request.Method.GET, url, null,
             Response.Listener {//데이터가 정상적으로 호출됐을 때 처리하는 부분
                 //받아온 json 데이터를 Toast message로 출력
                     response ->
                 try { //response(영화 JSON 데이터)가 정상적으로 넘어온 경우
-                    Toast.makeText(this, response.toString(), Toast.LENGTH_SHORT).show()
+                    // resoponse(영화 JSON 데이터) -> MovieList Data Class로 변환 (by GSON)
+                    val data: MovieList =
+                        gson.fromJson<MovieList>(response.toString(), MovieList::class.java)
+
+                    val adapter = MovieAdapter(this, data.results) //Adapter 선언
+                    movieRecycler.adapter = adapter //RecyclerView에 만든 MovieAdapter 셋팅
+
+                    val lm = LinearLayoutManager(this) //LinearLayoutManager 선언
+                    movieRecycler.layoutManager = lm //RecyclerView에 LinearLayoutManager 셋팅 (방향)
                 } catch (e: JSONException) {
                     //response가 정상적으로 넘어오지 않은 경우 4
                     Toast.makeText(this, e.localizedMessage, Toast.LENGTH_SHORT).show()
@@ -69,10 +73,5 @@ class MovieListActivity : AppCompatActivity() {
 
         requestQueue.add(request)
 
-        val adapter = MovieAdapter(this, movieList) //Adapter 선언
-        movieRecycler.adapter = adapter //RecyclerView에 만든 MovieAdapter 셋팅
-
-        val lm = LinearLayoutManager(this) //LinearLayoutManager 선언
-        movieRecycler.layoutManager = lm //RecyclerView에 LinearLayoutManager 셋팅 (방향)
     }
 }

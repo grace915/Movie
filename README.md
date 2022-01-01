@@ -2,6 +2,7 @@
 
 ## 앱 설명
 - 영화 앱
+
 ![image](https://user-images.githubusercontent.com/55349655/147848142-b68ed6e2-4304-420c-9f80-fcf3eabab60a.png)
 
 - 현재 상영중인 영화 리스트를 받아와서 보여줌
